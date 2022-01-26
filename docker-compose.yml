@@ -1,0 +1,82 @@
+version: '3'
+
+services:
+  ### CONFIG SERVER REPLICASET
+  cfg-svr1:
+    container_name: cfg-svr1
+    image: mongo
+    command: mongod --configsvr --replSet cfgrs1 --port 27017 --dbpath /data/db
+    ports:
+      - 40001:27017
+    networks:
+      - fog_sharding
+    volumes:
+      - cfg1_data:/data/db
+    depends_on:
+      - cfg-svr2
+
+  cfg-svr2:
+    container_name: cfg-svr2
+    image: mongo
+    command: mongod --configsvr --replSet cfgrs1 --port 27017 --dbpath /data/db
+    ports:
+      - 40002:27017
+    networks:
+      - fog_sharding
+    volumes:
+      - cfg2_data:/data/db
+  ### CONFIG SERVER REPLICASET END
+
+  ### SHARD REPLICASET
+  shard-svr1:
+    container_name: shard-svr1
+    image: mongo
+    command: mongod --shardsvr --replSet shardrs1 --port 27017 --dbpath /data/db
+    ports:
+      - 50001:27017
+    networks:
+      - fog_sharding
+    volumes:
+      - shard1_data:/data/db
+    depends_on:
+      - shard-svr2
+
+  shard-svr2:
+    container_name: shard-svr2
+    image: mongo
+    command: mongod --shardsvr --replSet shardrs1 --port 27017 --dbpath /data/db
+    ports:
+      - 50002:27017
+    networks:
+      - fog_sharding
+    volumes:
+      - shard2_data:/data/db
+  ### SHARD REPLICASET END
+
+  ### MONGOS
+  mongos:
+    container_name: mongos
+    image: mongo
+    command: mongos --configdb cfgrs1/cfg-svr1:27017,cfg-svr2:27017 --bind_ip 0.0.0.0 --port 27017
+    ports:
+      - 60000:27017
+    networks:
+      - fog_sharding
+    depends_on:
+      - shard-svr1
+      - cfg-svr1
+  ### MONGOS END 
+
+networks:
+  fog_sharding:
+    driver: bridge
+
+volumes:
+  cfg1_data:
+    driver: local
+  cfg2_data:
+    driver: local
+  shard1_data:
+    driver: local
+  shard2_data:
+    driver: local
