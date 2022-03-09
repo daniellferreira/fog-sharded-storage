@@ -2,7 +2,12 @@
 
 Este repositório define cada fog node com seus serviços básicos.
 
-## Setup
+# TODO
+- Criar doc de configuração do sharding no banco
+- Conectar dois clusters
+- Adicionar dados nos dois clusters
+
+# Setup
 
 ### Config Server
 ```sh
@@ -35,15 +40,23 @@ mongosh mongodb://127.0.0.1:60000 --eval 'sh.addShard(
 )'
 ```
 
-## Comandos
+## Comandos Úteis
 
-### Para subir o cluster
+### Docker
+Para subir o cluster
 ```sh
 docker-compose up -d
 ```
 
-### Para remover e remover os containers, redes, volumes e imagens criados pelo comando 'up' (flag -v para remover os volumes declarados)
+Para remover e remover os containers, redes, volumes e imagens criados pelo comando 'up' (flag -v para remover os volumes declarados)
 ```sh
 docker-compose down -v
 ```
+
+### Mongo Shell
+Para verificar o sharding funcionando
+```js
+sh.status()
+```
+
 
