@@ -57,8 +57,8 @@ mongosh mongodb://127.0.0.1:60000/shard<FOG_NODE_ID>_data --eval '
   sh.addShardTag("shardrs<FOG_NODE_ID>", "ZONE_S<FOG_NODE_ID>");
   sh.addTagRange(
     "shard<FOG_NODE_ID>_data.user_movements",
-    { shard_server: "<FOG_NODE_ID>" },
-    { shard_server: "<FOG_NODE_ID>" },
+    { shard_server: <FOG_NODE_ID> - 1 },
+    { shard_server: <FOG_NODE_ID> },
     "ZONE_S<FOG_NODE_ID>"
   );
 
