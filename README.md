@@ -43,9 +43,9 @@ mongosh mongodb://127.0.0.1:60000 --eval 'sh.addShard(
 
 # Enabling Sharding in a database and collection
 ```sh
-mongosh mongodb://127.0.0.1:60000/<FOG_NODE_ID>_data --eval '
-  sh.enableSharding("<FOG_NODE_ID>_data");
-  sh.shardCollection("<FOG_NODE_ID>_data.user_movements", { shard_server: 1 });
+mongosh mongodb://127.0.0.1:60000/shard<FOG_NODE_ID>_data --eval '
+  sh.enableSharding("shard<FOG_NODE_ID>_data");
+  sh.shardCollection("shard<FOG_NODE_ID>_data.user_movements", { shard_server: 1 });
 '
 ```
 
