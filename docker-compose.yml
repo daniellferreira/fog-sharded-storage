@@ -5,7 +5,7 @@ services:
   cfg-svr1:
     container_name: cfg-svr1
     image: mongo
-    command: mongod --configsvr --replSet cfgrs1 --port 27017 --dbpath /data/db
+    command: mongod --configsvr --replSet cfgrs<FOG_NODE_ID> --port 27017 --dbpath /data/db
     ports:
       - 40001:27017
     networks:
@@ -18,7 +18,7 @@ services:
   cfg-svr2:
     container_name: cfg-svr2
     image: mongo
-    command: mongod --configsvr --replSet cfgrs1 --port 27017 --dbpath /data/db
+    command: mongod --configsvr --replSet cfgrs<FOG_NODE_ID> --port 27017 --dbpath /data/db
     ports:
       - 40002:27017
     networks:
@@ -31,7 +31,7 @@ services:
   shard-svr1:
     container_name: shard-svr1
     image: mongo
-    command: mongod --shardsvr --replSet shardrs1 --port 27017 --dbpath /data/db
+    command: mongod --shardsvr --replSet shardrs<FOG_NODE_ID> --port 27017 --dbpath /data/db
     ports:
       - 50001:27017
     networks:
@@ -44,7 +44,7 @@ services:
   shard-svr2:
     container_name: shard-svr2
     image: mongo
-    command: mongod --shardsvr --replSet shardrs1 --port 27017 --dbpath /data/db
+    command: mongod --shardsvr --replSet shardrs<FOG_NODE_ID> --port 27017 --dbpath /data/db
     ports:
       - 50002:27017
     networks:
@@ -57,7 +57,7 @@ services:
   mongos:
     container_name: mongos
     image: mongo
-    command: mongos --configdb cfgrs1/cfg-svr1:27017,cfg-svr2:27017 --bind_ip 0.0.0.0 --port 27017
+    command: mongos --configdb cfgrs<FOG_NODE_ID>/cfg-svr1:27017,cfg-svr2:27017 --bind_ip 0.0.0.0 --port 27017
     ports:
       - 60000:27017
     networks:
