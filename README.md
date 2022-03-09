@@ -41,11 +41,28 @@ mongosh mongodb://127.0.0.1:60000 --eval 'sh.addShard(
 )'
 ```
 
-# Enabling Sharding in a database and collection
+# Dentro do mongos
+Habilitar sharding no database e collection
 ```sh
 mongosh mongodb://127.0.0.1:60000/shard<FOG_NODE_ID>_data --eval '
   sh.enableSharding("shard<FOG_NODE_ID>_data");
   sh.shardCollection("shard<FOG_NODE_ID>_data.user_movements", { shard_server: 1 });
+'
+```
+Configurando as zonas de dados
+```sh
+mongosh mongodb://127.0.0.1:60000/shard<FOG_NODE_ID>_data --eval '
+  while (sh.isBalancerRunning().inBalancerRound) sh.disableBalancing("shard<FOG_NODE_ID>_data");
+  
+  sh.addShardTag("shardrs<FOG_NODE_ID>", "ZONE_S<FOG_NODE_ID>");
+  sh.addTagRange(
+    "shard<FOG_NODE_ID>_data.user_movements",
+    { shard_server: "<FOG_NODE_ID>" },
+    { shard_server: "<FOG_NODE_ID>" },
+    "ZONE_S<FOG_NODE_ID>"
+  );
+
+    while (!sh.isBalancerRunning().inBalancerRound) sh.enableBalancing("shard<FOG_NODE_ID>_data");
 '
 ```
 
