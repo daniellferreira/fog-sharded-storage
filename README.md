@@ -21,7 +21,7 @@ mongosh mongodb://127.0.0.1:40001 --eval 'rs.initiate({
   ]
 })'
 ```
-
+### Shard
 ```sh
 echo "setting up fog node shard server..."
 mongosh mongodb://127.0.0.1:50001 --eval 'rs.initiate({
@@ -33,11 +33,20 @@ mongosh mongodb://127.0.0.1:50001 --eval 'rs.initiate({
 })'
 ```
 
+### Mongos
 ```sh
 echo "setting up fog node router (mongos)..."
 mongosh mongodb://127.0.0.1:60000 --eval 'sh.addShard(
   "shardrs<FOG_NODE_ID>/shard-svr1:27017,shard-svr2:27017"
 )'
+```
+
+# Enabling Sharding in a database and collection
+```sh
+mongosh mongodb://127.0.0.1:60000/<FOG_NODE_ID>_data --eval '
+  sh.enableSharding("<FOG_NODE_ID>_data");
+  sh.shardCollection("<FOG_NODE_ID>_data.user_movements", { shard_server: 1 });
+'
 ```
 
 ## Comandos Úteis
