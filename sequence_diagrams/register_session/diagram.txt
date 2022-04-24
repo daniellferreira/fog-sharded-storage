@@ -1,0 +1,47 @@
+title Register Session Sequence Diagram
+
+actor Device
+
+participant Fog Node
+database Fog Database
+participant OTS
+database OTS Database
+
+activate Device
+
+Device->Fog Node:registerConnection()
+
+activate Fog Node
+
+Fog Node->OTS: registerSession()
+
+activate OTS
+
+OTS->OTS: newSessionId()
+
+activate OTS
+OTS<--OTS:session_id
+deactivate OTS
+
+OTS->OTS Database:save()
+activate OTS Database
+
+OTS<--OTS Database: ok
+
+deactivate OTS Database
+
+Fog Node<--OTS:session_id
+
+deactivate OTS
+
+
+Fog Node->Fog Node:storeSessionId()
+activate Fog Node
+Fog Node->Fog Database:save()
+activate Fog Database
+Fog Node<--Fog Database:ok
+deactivate Fog Database
+deactivate Fog Node
+
+Device<--Fog Node:session_id
+deactivate Fog Node
