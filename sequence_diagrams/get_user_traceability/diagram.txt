@@ -1,0 +1,48 @@
+title Get User Data Sequence Diagram
+
+boundary User Interface
+participant Retrieve Data
+participant OTS
+database OTS Database
+participant Fog Node X
+participant Fog Node Y
+
+activate User Interface
+User Interface->Retrieve Data:getUserData()
+
+activate Retrieve Data
+Retrieve Data->OTS:getData()
+activate OTS
+OTS->OTS Database:findAll()
+activate OTS Database
+OTS<--OTS Database:query response
+deactivate OTS Database
+Retrieve Data<--OTS:user traceability
+deactivate OTS
+
+Retrieve Data->Retrieve Data:getBestSearch()
+activate Retrieve Data
+Retrieve Data<--Retrieve Data:best route
+deactivate Retrieve Data
+
+par
+  Retrieve Data->Fog Node X:getUserData()
+  activate Fog Node X
+  Retrieve Data<--Fog Node X:partial user data
+  deactivate Fog Node X
+
+  thread
+  Retrieve Data->Fog Node Y:getUserData()
+  activate Fog Node Y
+  Retrieve Data<--Fog Node Y:partial user data
+  deactivate Fog Node Y
+end
+
+Retrieve Data->Retrieve Data:mergeUserData()
+activate Retrieve Data
+Retrieve Data<--Retrieve Data:final user data
+deactivate Retrieve Data
+
+User Interface<--Retrieve Data:user data
+deactivate Retrieve Data
+deactivate User Interface

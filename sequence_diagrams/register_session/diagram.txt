@@ -1,19 +1,20 @@
 title Register Session Sequence Diagram
 
-actor Device
-
-participant Fog Node
-database Fog Database
+participant Edge Device
+participant Fog Node X
+database Fog Database X
+participant Fog Node Y
+database Fog Database Y
 participant OTS
 database OTS Database
 
-activate Device
+activate Edge Device
 
-Device->Fog Node:registerConnection()
+Edge Device->Fog Node X:registerConnection()
 
-activate Fog Node
+activate Fog Node X
 
-Fog Node->OTS: registerSession()
+Fog Node X->OTS: registerSession()
 
 activate OTS
 
@@ -30,18 +31,37 @@ OTS<--OTS Database: ok
 
 deactivate OTS Database
 
-Fog Node<--OTS:session_id
+OTS->OTS Database:expireOldSession()
+activate OTS Database
+OTS<--OTS Database: ok
+deactivate OTS Database
+
+Fog Node Y<-OTS:expireSession()
+activate Fog Node Y
+Fog Node Y->Fog Database Y:expireSession()
+activate Fog Database Y
+Fog Node Y<--Fog Database Y:ok
+deactivate Fog Database Y
+deactivate Fog Node Y
+
+Fog Node X<--OTS:session_id
+
+deactivate OTS
+
+activate OTS
+
+
 
 deactivate OTS
 
 
-Fog Node->Fog Node:storeSessionId()
-activate Fog Node
-Fog Node->Fog Database:save()
-activate Fog Database
-Fog Node<--Fog Database:ok
-deactivate Fog Database
-deactivate Fog Node
+Fog Node X->Fog Node X:storeSessionId()
+activate Fog Node X
+Fog Node X->Fog Database X:save()
+activate Fog Database X
+Fog Node X<--Fog Database X:ok
+deactivate Fog Database X
+deactivate Fog Node X
 
-Device<--Fog Node:session_id
-deactivate Fog Node
+Edge Device<--Fog Node X:session_id
+deactivate Fog Node X

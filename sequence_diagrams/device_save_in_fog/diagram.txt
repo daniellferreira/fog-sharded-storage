@@ -1,0 +1,31 @@
+title Edge Device Storage in Fog Node Sequence Diagram
+
+participant Edge Device
+participant Fog Node
+database Fog Database
+
+activate Edge Device
+
+Edge Device->Fog Node:saveData()
+
+activate Fog Node
+
+alt hasSessionId
+	Fog Node->Fog Database:getBySessionId()
+    activate Fog Database
+    Fog Node<--Fog Database:session_data
+    deactivate Fog Database
+    alt session_data == null OR isExpiredSession
+    	Edge Device<--Fog Node:"session_id is invalid"
+    else else
+    	Fog Node->Fog Database: save()
+        activate Fog Database
+        Fog Node<--Fog Database:ok
+        deactivate Fog Database
+        Edge Device<--Fog Node:ok
+    end
+else else
+	Edge Device<--Fog Node:"session_id is required"
+end
+
+deactivate Fog Node
