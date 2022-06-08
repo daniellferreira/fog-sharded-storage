@@ -7,7 +7,7 @@ services:
     image: mongo
     command: mongod --configsvr --replSet cfgrs<FOG_NODE_ID> --port 27017 --dbpath /data/db
     ports:
-      - 4<FOG_NODE_ID>:27017
+      - 4<FOG_NODE_ID>1:27017
     networks:
       - fog_sharding
     volumes:
@@ -20,7 +20,7 @@ services:
     image: mongo
     command: mongod --configsvr --replSet cfgrs<FOG_NODE_ID> --port 27017 --dbpath /data/db
     ports:
-      - 4<FOG_NODE_ID>:27017
+      - 4<FOG_NODE_ID>2:27017
     networks:
       - fog_sharding
     volumes:
@@ -33,7 +33,7 @@ services:
     image: mongo
     command: mongod --shardsvr --replSet shardrs<FOG_NODE_ID> --port 27017 --dbpath /data/db
     ports:
-      - 5<FOG_NODE_ID>:27017
+      - 5<FOG_NODE_ID>1:27017
     networks:
       - fog_sharding
     volumes:
@@ -46,7 +46,7 @@ services:
     image: mongo
     command: mongod --shardsvr --replSet shardrs<FOG_NODE_ID> --port 27017 --dbpath /data/db
     ports:
-      - 5<FOG_NODE_ID>:27017
+      - 5<FOG_NODE_ID>2:27017
     networks:
       - fog_sharding
     volumes:
@@ -59,7 +59,7 @@ services:
     image: mongo
     command: mongos --configdb cfgrs<FOG_NODE_ID>/<FOG_NODE_ID>-cfg-svr1:27017,<FOG_NODE_ID>-cfg-svr2:27017 --bind_ip 0.0.0.0 --port 27017
     ports:
-      - 6<FOG_NODE_ID>:27017
+      - 6<FOG_NODE_ID>1:27017
     networks:
       - fog_sharding
     depends_on:
