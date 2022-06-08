@@ -1,0 +1,156 @@
+version: '3'
+
+services:
+  ### CONFIG SERVER REPLICASET
+  301-cfg-svr1:
+    container_name: 301-cfg-svr1
+    image: mongo
+    command: mongod --configsvr --replSet cfgrs301 --port 27017 --dbpath /data/db
+    ports:
+      - 43011:27017
+    networks:
+      - fog_sharding
+    volumes:
+      - 301_cfg1_data:/data/db
+    depends_on:
+      - 301-cfg-svr2
+
+  301-cfg-svr2:
+    container_name: 301-cfg-svr2
+    image: mongo
+    command: mongod --configsvr --replSet cfgrs301 --port 27017 --dbpath /data/db
+    ports:
+      - 43012:27017
+    networks:
+      - fog_sharding
+    volumes:
+      - 301_cfg2_data:/data/db
+  ### CONFIG SERVER REPLICASET END
+
+  ### SHARD REPLICASET
+  301-shard-svr1:
+    container_name: 301-shard-svr1
+    image: mongo
+    command: mongod --shardsvr --replSet shardrs301 --port 27017 --dbpath /data/db
+    ports:
+      - 53011:27017
+    networks:
+      - fog_sharding
+    volumes:
+      - 301_shard1_data:/data/db
+    depends_on:
+      - 301-shard-svr2
+
+  301-shard-svr2:
+    container_name: 301-shard-svr2
+    image: mongo
+    command: mongod --shardsvr --replSet shardrs301 --port 27017 --dbpath /data/db
+    ports:
+      - 53012:27017
+    networks:
+      - fog_sharding
+    volumes:
+      - 301_shard2_data:/data/db
+  ### SHARD REPLICASET END
+
+  ### MONGOS
+  301-mongos:
+    container_name: 301-mongos
+    image: mongo
+    command: mongos --configdb cfgrs301/301-cfg-svr1:27017,301-cfg-svr2:27017 --bind_ip 0.0.0.0 --port 27017
+    ports:
+      - 63011:27017
+    networks:
+      - fog_sharding
+    depends_on:
+      - 301-shard-svr1
+      - 301-cfg-svr1
+  ### MONGOS END 
+
+  ### CONFIG SERVER REPLICASET
+  302-cfg-svr1:
+    container_name: 302-cfg-svr1
+    image: mongo
+    command: mongod --configsvr --replSet cfgrs302 --port 27017 --dbpath /data/db
+    ports:
+      - 43021:27017
+    networks:
+      - fog_sharding
+    volumes:
+      - 302_cfg1_data:/data/db
+    depends_on:
+      - 302-cfg-svr2
+
+  302-cfg-svr2:
+    container_name: 302-cfg-svr2
+    image: mongo
+    command: mongod --configsvr --replSet cfgrs302 --port 27017 --dbpath /data/db
+    ports:
+      - 43022:27017
+    networks:
+      - fog_sharding
+    volumes:
+      - 302_cfg2_data:/data/db
+  ### CONFIG SERVER REPLICASET END
+
+  ### SHARD REPLICASET
+  302-shard-svr1:
+    container_name: 302-shard-svr1
+    image: mongo
+    command: mongod --shardsvr --replSet shardrs302 --port 27017 --dbpath /data/db
+    ports:
+      - 53021:27017
+    networks:
+      - fog_sharding
+    volumes:
+      - 302_shard1_data:/data/db
+    depends_on:
+      - 302-shard-svr2
+
+  302-shard-svr2:
+    container_name: 302-shard-svr2
+    image: mongo
+    command: mongod --shardsvr --replSet shardrs302 --port 27017 --dbpath /data/db
+    ports:
+      - 53022:27017
+    networks:
+      - fog_sharding
+    volumes:
+      - 302_shard2_data:/data/db
+  ### SHARD REPLICASET END
+
+  ### MONGOS
+  302-mongos:
+    container_name: 302-mongos
+    image: mongo
+    command: mongos --configdb cfgrs302/302-cfg-svr1:27017,302-cfg-svr2:27017 --bind_ip 0.0.0.0 --port 27017
+    ports:
+      - 63021:27017
+    networks:
+      - fog_sharding
+    depends_on:
+      - 302-shard-svr1
+      - 302-cfg-svr1
+  ### MONGOS END 
+
+networks:
+  fog_sharding:
+    driver: bridge
+
+volumes:
+  301_cfg1_data:
+    driver: local
+  301_cfg2_data:
+    driver: local
+  301_shard1_data:
+    driver: local
+  301_shard2_data:
+    driver: local
+  302_cfg1_data:
+    driver: local
+  302_cfg2_data:
+    driver: local
+  302_shard1_data:
+    driver: local
+  302_shard2_data:
+    driver: local
