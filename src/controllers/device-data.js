@@ -1,13 +1,37 @@
-const mongoose = require("mongoose");
-const Session = require("../models/device-data");
+const Session = require("../models/session");
+const UserMovement = require("../models/user-movement");
+
+async function validateSession(sessionId, userId) {
+  if (!sessionId || !userId) {
+    throw { message: "session_id or user_id is required" };
+  }
+
+  const session = await Session().findOne({
+    session_id: sessionId,
+    user_id: userId,
+  });
+  if (!session || session.status !== "active") {
+    throw { message: "invalid session_id" };
+  }
+}
 
 module.exports = {
   saveData: async (req, res) => {
     try {
-      const session = new Session(req.body);
-      const result = await session.save();
+      const sessionId = req.headers["x-session-id"];
+      const { user_id } = req.params;
 
-      return res.status(201).json(result);
+      await validateSession(sessionId, user_id);
+
+      const userData = new UserMovement()({
+        shard_server: process.env.SHARD_SERVER_ID,
+        session_id: sessionId,
+        user_id: user_id,
+        metadata: req.body,
+      });
+      const savedData = await userData.save();
+
+      return res.status(201).json(savedData);
     } catch (error) {
       console.log(error.name);
       if (["MongoServerError", "ValidationError"].includes(error.name)) {
@@ -18,28 +42,13 @@ module.exports = {
   },
   getData: async (req, res) => {
     try {
-      let { user, connected_from, connected_to } = req.query;
-
-      if ([null, undefined, ""].includes(user, connected_from, connected_to)) {
-        return res.status(401).json({
-          message:
-            "user, connected_from and connected_to are required query string params",
-        });
-      }
+      let { session_id } = req.query;
 
       const filter = {
-        user,
-        connected_at: {
-          $gte: new Date(connected_from).toISOString(),
-          $lte: new Date(connected_to).toISOString(),
-        },
+        session_id: { $in: session_id.split(",") },
       };
 
-      const result = await Session.find(filter);
-
-      if (!result || result.length == 0) {
-        return res.status(404).json({ message: "track not found" });
-      }
+      const result = await UserMovement().find(filter);
 
       return res.status(200).json(result);
     } catch (error) {

@@ -6,16 +6,8 @@ const schema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    router_address: {
-      type: String,
-      required: true,
-    },
     session_id: {
       type: String,
-      required: true,
-    },
-    connected_at: {
-      type: Date,
       required: true,
     },
     user_id: {
@@ -35,11 +27,10 @@ const schema = new mongoose.Schema(
         delete ret.__v;
       },
     },
+    timestamps: true,
   }
 );
 
-schema.index({ session_id: 1 }, { unique: true });
-schema.index({ connected_at: 1, user_id: "hashed" });
-schema.index({ user_id: "hashed" });
-
-module.exports = mongoose.model("Session", schema);
+module.exports = function () {
+  return global.shard_db.model("UserMovement", schema, "user_movements");
+};

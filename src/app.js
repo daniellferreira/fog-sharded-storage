@@ -26,9 +26,22 @@ class App {
   async init() {
     log.info("Connecting to db...");
 
-    await mongoose.connect(process.env.DB_CONNECTION_STRING);
+    global.shard_db = await mongoose
+      .createConnection(process.env.DB_CONNECTION_STRING_SHARD)
+      .asPromise();
+    global.registerSession_db = await mongoose
+      .createConnection(process.env.DB_CONNECTION_STRING_REGISTER_SESSION)
+      .asPromise();
+
+    // await mongoose.connect(process.env.DB_CONNECTION_STRING);
 
     this.registerRoutes();
+    global.log.info("Registered routes:");
+    this.server._router.stack.forEach(function (r) {
+      if (r.route && r.route.path) {
+        global.log.info(r.route.path);
+      }
+    });
   }
 
   async close() {
@@ -37,12 +50,29 @@ class App {
   }
 
   registerRoutes() {
-    this.server.get("/ots/ping", (req, res) => {
+    const baseUrl = `fog-${process.env.SHARD_SERVER_ID}`;
+
+    this.server.get(`/${baseUrl}/ping`, (req, res) => {
       res.send(`pong`);
     });
 
-    this.server.post("/ots/register-session", SessionController.saveSession);
-    this.server.get("/ots/track-user", SessionController.trackUser);
+    this.server.post(
+      `/${baseUrl}/save-data/:user_id`,
+      DeviceDataController.saveData
+    );
+    this.server.get(
+      `/${baseUrl}/get-data`,
+      (req, res, next) => {
+        if (!req.query.session_id) {
+          return res.status(400).json({
+            message:
+              "at least one session_id is required in query string to perform this operation",
+          });
+        }
+        next();
+      },
+      DeviceDataController.getData
+    );
   }
 }
 
