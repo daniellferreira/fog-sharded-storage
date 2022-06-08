@@ -14,7 +14,7 @@ Este repositório define cada fog node com seus serviços básicos.
 
 ```sh
 echo "setting up fog node config server..."
-mongosh mongodb://127.0.0.1:40001 --eval 'rs.initiate({
+mongosh mongodb://127.0.0.1:4<FOG_NODE_ID> --eval 'rs.initiate({
   _id: "cfgrs<FOG_NODE_ID>",
   configsvr: true,
   members: [
@@ -28,7 +28,7 @@ mongosh mongodb://127.0.0.1:40001 --eval 'rs.initiate({
 
 ```sh
 echo "setting up fog node shard server..."
-mongosh mongodb://127.0.0.1:50001 --eval 'rs.initiate({
+mongosh mongodb://127.0.0.1:5<FOG_NODE_ID> --eval 'rs.initiate({
   _id: "shardrs<FOG_NODE_ID>",
   members: [
     {_id: 0, host: "<FOG_NODE_ID>-shard-svr1:27017"},
@@ -41,7 +41,7 @@ mongosh mongodb://127.0.0.1:50001 --eval 'rs.initiate({
 
 ```sh
 echo "setting up fog node router (mongos)..."
-mongosh mongodb://127.0.0.1:60000 --eval 'sh.addShard(
+mongosh mongodb://127.0.0.1:6<FOG_NODE_ID> --eval 'sh.addShard(
   "shardrs<FOG_NODE_ID>/<FOG_NODE_ID>-shard-svr1:27017,<FOG_NODE_ID>-shard-svr2:27017"
 )'
 ```
@@ -51,7 +51,7 @@ mongosh mongodb://127.0.0.1:60000 --eval 'sh.addShard(
 Habilitar sharding no database e collection
 
 ```sh
-mongosh mongodb://127.0.0.1:60000/shard<FOG_NODE_ID>_data --eval '
+mongosh mongodb://127.0.0.1:6<FOG_NODE_ID>/shard<FOG_NODE_ID>_data --eval '
   sh.enableSharding("shard<FOG_NODE_ID>_data");
   sh.shardCollection("shard<FOG_NODE_ID>_data.user_movements", { shard_server: 1 });
 '
@@ -60,7 +60,7 @@ mongosh mongodb://127.0.0.1:60000/shard<FOG_NODE_ID>_data --eval '
 Configurando as zonas de dados
 
 ```sh
-mongosh mongodb://127.0.0.1:60000/shard<FOG_NODE_ID>_data --eval '
+mongosh mongodb://127.0.0.1:6<FOG_NODE_ID>/shard<FOG_NODE_ID>_data --eval '
   while (sh.isBalancerRunning().inBalancerRound) sh.disableBalancing("shard<FOG_NODE_ID>_data");
 
   sh.addShardTag("shardrs<FOG_NODE_ID>", "ZONE_S<FOG_NODE_ID>");
