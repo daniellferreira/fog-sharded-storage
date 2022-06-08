@@ -2,8 +2,8 @@ version: '3'
 
 services:
   ### CONFIG SERVER REPLICASET
-  cfg-svr1:
-    container_name: cfg-svr1
+  <FOG_NODE_ID>-cfg-svr1:
+    container_name: <FOG_NODE_ID>-cfg-svr1
     image: mongo
     command: mongod --configsvr --replSet cfgrs<FOG_NODE_ID> --port 27017 --dbpath /data/db
     ports:
@@ -13,10 +13,10 @@ services:
     volumes:
       - cfg1_data:/data/db
     depends_on:
-      - cfg-svr2
+      - <FOG_NODE_ID>-cfg-svr2
 
-  cfg-svr2:
-    container_name: cfg-svr2
+  <FOG_NODE_ID>-cfg-svr2:
+    container_name: <FOG_NODE_ID>-cfg-svr2
     image: mongo
     command: mongod --configsvr --replSet cfgrs<FOG_NODE_ID> --port 27017 --dbpath /data/db
     ports:
@@ -28,8 +28,8 @@ services:
   ### CONFIG SERVER REPLICASET END
 
   ### SHARD REPLICASET
-  shard-svr1:
-    container_name: shard-svr1
+  <FOG_NODE_ID>-shard-svr1:
+    container_name: <FOG_NODE_ID>-shard-svr1
     image: mongo
     command: mongod --shardsvr --replSet shardrs<FOG_NODE_ID> --port 27017 --dbpath /data/db
     ports:
@@ -39,10 +39,10 @@ services:
     volumes:
       - shard1_data:/data/db
     depends_on:
-      - shard-svr2
+      - <FOG_NODE_ID>-shard-svr2
 
-  shard-svr2:
-    container_name: shard-svr2
+  <FOG_NODE_ID>-shard-svr2:
+    container_name: <FOG_NODE_ID>-shard-svr2
     image: mongo
     command: mongod --shardsvr --replSet shardrs<FOG_NODE_ID> --port 27017 --dbpath /data/db
     ports:
@@ -54,17 +54,17 @@ services:
   ### SHARD REPLICASET END
 
   ### MONGOS
-  mongos:
-    container_name: mongos
+  <FOG_NODE_ID>-mongos:
+    container_name: <FOG_NODE_ID>-mongos
     image: mongo
-    command: mongos --configdb cfgrs<FOG_NODE_ID>/cfg-svr1:27017,cfg-svr2:27017 --bind_ip 0.0.0.0 --port 27017
+    command: mongos --configdb cfgrs<FOG_NODE_ID>/<FOG_NODE_ID>-cfg-svr1:27017,<FOG_NODE_ID>-cfg-svr2:27017 --bind_ip 0.0.0.0 --port 27017
     ports:
       - 60000:27017
     networks:
       - fog_sharding
     depends_on:
-      - shard-svr1
-      - cfg-svr1
+      - <FOG_NODE_ID>-shard-svr1
+      - <FOG_NODE_ID>-cfg-svr1
   ### MONGOS END 
 
 networks:
