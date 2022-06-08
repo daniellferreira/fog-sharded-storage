@@ -11,7 +11,7 @@ services:
     networks:
       - fog_sharding
     volumes:
-      - cfg1_data:/data/db
+      - <FOG_NODE_ID>_cfg1_data:/data/db
     depends_on:
       - <FOG_NODE_ID>-cfg-svr2
 
@@ -24,7 +24,7 @@ services:
     networks:
       - fog_sharding
     volumes:
-      - cfg2_data:/data/db
+      - <FOG_NODE_ID>_cfg2_data:/data/db
   ### CONFIG SERVER REPLICASET END
 
   ### SHARD REPLICASET
@@ -37,7 +37,7 @@ services:
     networks:
       - fog_sharding
     volumes:
-      - shard1_data:/data/db
+      - <FOG_NODE_ID>_shard1_data:/data/db
     depends_on:
       - <FOG_NODE_ID>-shard-svr2
 
@@ -50,7 +50,7 @@ services:
     networks:
       - fog_sharding
     volumes:
-      - shard2_data:/data/db
+      - <FOG_NODE_ID>_shard2_data:/data/db
   ### SHARD REPLICASET END
 
   ### MONGOS
@@ -72,11 +72,11 @@ networks:
     driver: bridge
 
 volumes:
-  cfg1_data:
+  <FOG_NODE_ID>_cfg1_data:
     driver: local
-  cfg2_data:
+  <FOG_NODE_ID>_cfg2_data:
     driver: local
-  shard1_data:
+  <FOG_NODE_ID>_shard1_data:
     driver: local
-  shard2_data:
+  <FOG_NODE_ID>_shard2_data:
     driver: local
