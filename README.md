@@ -2,12 +2,6 @@
 
 Este repositório define cada fog node com seus serviços básicos.
 
-# TODO
-
-- Fazer um segundo cluster
-- Conectar dois clusters
-- Adicionar dados nos dois clusters
-
 # Setup
 
 ### Config Server
